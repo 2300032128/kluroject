@@ -1,0 +1,49 @@
+name: CI & Deployment Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Test Suites
+        run: |
+          cd backend
+          python test_student_interaction_agent.py
+          python test_syllabus_grounding_agent.py
+          python test_contradiction_analysis.py
+          python test_answer_composition.py
+          python test_escalation_agent.py
+          python test_doubt_analytics_agent.py
+          python test_hackathon_demo_mode.py
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Build Next.js
+        run: |
+          cd frontend
+          npm run build
